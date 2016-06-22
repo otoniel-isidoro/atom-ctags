@@ -61,7 +61,7 @@ class FileView extends SymbolsView
   getCurSymbol: ->
     editor = atom.workspace.getActiveTextEditor()
     if not editor
-      console.error "[atom-ctags:getCurSymbol] failed getActiveTextEditor "
+      console.error "[atom-ruby-ctags:getCurSymbol] failed getActiveTextEditor "
       return
 
     cursor = editor.getLastCursor()
@@ -77,7 +77,7 @@ class FileView extends SymbolsView
   rebuild: ->
     projectPaths = atom.project.getPaths()
     if projectPaths.length < 1
-      console.error "[atom-ctags:rebuild] cancel rebuild, invalid projectPath: #{projectPath}"
+      console.error "[atom-ruby-ctags:rebuild] cancel rebuild, invalid projectPath: #{projectPath}"
       return
     @ctagsCache.cachedTags = {}
     @ctagsCache.generateTags projectPath for projectPath in projectPaths
@@ -85,7 +85,7 @@ class FileView extends SymbolsView
   goto: ->
     symbol = @getCurSymbol()
     if not symbol
-      console.error "[atom-ctags:goto] failed getCurSymbol"
+      console.error "[atom-ruby-ctags:goto] failed getCurSymbol"
       return
 
     tags = @ctagsCache.findTags(symbol)

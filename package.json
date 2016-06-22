@@ -1,11 +1,12 @@
 {
-  "name": "atom-ctags",
-  "version": "4.5.2",
+  "name": "atom-ruby-ctags",
+  "version": "1.0.0",
   "main": "./lib/main",
-  "description": "better autocomplete for atom",
+  "description": "better ruby autocomplete for atom that use ripper-tags",
   "keywords": [
     "autocomplete",
-    "ctags"
+    "ctags",
+    "ripper-tags"
   ],
   "license": "MIT",
   "dependencies": {
@@ -14,7 +15,7 @@
     "ctags": "https://github.com/yongkangchen/node-ctags/archive/3.0.tar.gz",
     "atom-space-pen-views": "^2.0.0"
   },
-  "repository": "https://github.com/yongkangchen/atom-ctags",
+  "repository": "https://github.com/otoniel-isidoro/atom-ruby-ctags",
   "engines": {
     "atom": "*"
   },

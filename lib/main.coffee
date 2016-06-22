@@ -14,19 +14,20 @@ module.exports =
       title: 'Automatically rebuild tags'
       description: 'Rebuild tags file each time a project path changes'
       type: 'boolean'
-      default: false
+      default: true
     buildTimeout:
       title: 'Build timeout'
       description: 'Time (in milliseconds) to wait for a tags rebuild to finish'
       type: 'integer'
-      default: 10000
+      default: 30000
     cmd:
       type: 'string'
-      default: ""
+      default: 'ripper-tags'
+      description: 'ripper-tags command path'
     cmdArgs:
       description: 'Add specified ctag command args like: --exclude=lib --exclude=*.js'
       type: 'string'
-      default: ""
+      default: '--exclude=.bundle/ --exclude=.git/ --exclude=coverage/ --exclude=.arcanist-extensions/ --exclude=log/ --exclude=tmp/ --exclude=bin/'
     extraTagFiles:
       description: 'Add specified tagFiles. (Make sure you tag file generate with --fields=+KSn)'
       type: 'string'
@@ -49,11 +50,11 @@ module.exports =
 
     @ctagsCache.activate()
 
-    @ctagsCache.initTags(atom.project.getPaths(), atom.config.get('atom-ctags.autoBuildTagsWhenActive'))
+    @ctagsCache.initTags(atom.project.getPaths(), atom.config.get('atom-ruby-ctags.autoBuildTagsWhenActive'))
     @disposable = atom.project.onDidChangePaths (paths)=>
-      @ctagsCache.initTags(paths, atom.config.get('atom-ctags.autoBuildTagsWhenActive'))
+      @ctagsCache.initTags(paths, atom.config.get('atom-ruby-ctags.autoBuildTagsWhenActive'))
 
-    atom.commands.add 'atom-workspace', 'atom-ctags:rebuild', (e, cmdArgs)=>
+    atom.commands.add 'atom-workspace', 'atom-ruby-ctags:rebuild', (e, cmdArgs)=>
       console.error "rebuild: ", e
       @ctagsCache.cmdArgs = cmdArgs if Array.isArray(cmdArgs)
       @createFileView().rebuild(true)
@@ -61,39 +62,39 @@ module.exports =
         clearTimeout(t)
         t = null
 
-    atom.commands.add 'atom-workspace', 'atom-ctags:toggle-project-symbols', =>
+    atom.commands.add 'atom-workspace', 'atom-ruby-ctags:toggle-project-symbols', =>
       @createFileView().toggleAll()
 
     atom.commands.add 'atom-text-editor',
-      'atom-ctags:toggle-file-symbols': => @createFileView().toggle()
-      'atom-ctags:go-to-declaration': => @createFileView().goto()
-      'atom-ctags:return-from-declaration': => @createGoBackView().toggle()
+      'atom-ruby-ctags:toggle-file-symbols': => @createFileView().toggle()
+      'atom-ruby-ctags:go-to-declaration': => @createFileView().goto()
+      'atom-ruby-ctags:return-from-declaration': => @createGoBackView().toggle()
 
     atom.workspace.observeTextEditors (editor) =>
       editorView = atom.views.getView(editor)
       {$} = require 'atom-space-pen-views' unless $
       $(editorView).on 'mousedown', (event) =>
-        which = atom.config.get('atom-ctags.GotoSymbolClick')
+        which = atom.config.get('atom-ruby-ctags.GotoSymbolClick')
         return unless MouseEventWhichDict[which] == event.which
-        for keyName in atom.config.get('atom-ctags.GotoSymbolKey')
+        for keyName in atom.config.get('atom-ruby-ctags.GotoSymbolKey')
           return if not event[keyName+"Key"]
         @createFileView().goto()
 
     if not atom.packages.isPackageDisabled("symbols-view")
       atom.packages.disablePackage("symbols-view")
-      alert "Warning from atom-ctags:
-              atom-ctags replaces and enhances the symbols-view package.
+      alert "Warning from atom-ruby-ctags:
+              atom-ruby-ctags replaces and enhances the symbols-view package.
               Therefore, symbols-view has been disabled."
 
-    atom.config.observe 'atom-ctags.disableComplete', =>
+    atom.config.observe 'atom-ruby-ctags.disableComplete', =>
       return unless @provider
-      @provider.disabled = atom.config.get('atom-ctags.disableComplete')
+      @provider.disabled = atom.config.get('atom-ruby-ctags.disableComplete')
 
     initExtraTagsTime = null
-    atom.config.observe 'atom-ctags.extraTagFiles', =>
+    atom.config.observe 'atom-ruby-ctags.extraTagFiles', =>
       clearTimeout initExtraTagsTime if initExtraTagsTime
       initExtraTagsTime = setTimeout((=>
-        @ctagsCache.initExtraTags(atom.config.get('atom-ctags.extraTagFiles').split(" "))
+        @ctagsCache.initExtraTags(atom.config.get('atom-ruby-ctags.extraTagFiles').split(" "))
         initExtraTagsTime = null
       ), 1000)
 
@@ -138,5 +139,5 @@ module.exports =
       CtagsProvider = require './ctags-provider'
       @provider = new CtagsProvider()
       @provider.ctagsCache = @ctagsCache
-      @provider.disabled = atom.config.get('atom-ctags.disableComplete')
+      @provider.disabled = atom.config.get('atom-ruby-ctags.disableComplete')
     @provider
